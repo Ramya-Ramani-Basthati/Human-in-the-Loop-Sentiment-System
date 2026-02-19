@@ -5,6 +5,7 @@ import os
 import train_model
 import seaborn as sns
 import matplotlib.pyplot as plt
+import altair as alt  # ✅ Updated Altair import
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -95,7 +96,16 @@ if os.path.exists(ACCURACY_FILE):
     st.subheader("📈 Accuracy Over Time")
     acc_data = pd.read_csv(ACCURACY_FILE)
     if not acc_data.empty:
-        st.line_chart(acc_data)
+        # Altair line chart for accuracy over time
+        if 'accuracy' in acc_data.columns:
+            acc_data = acc_data.reset_index()
+            chart = alt.Chart(acc_data).mark_line(point=True).encode(
+                x=alt.X('index', title='Iteration'),
+                y=alt.Y('accuracy', title='Accuracy')
+            ).properties(width=700, height=400)
+            st.altair_chart(chart, use_container_width=True)
+        else:
+            st.line_chart(acc_data)
     else:
         st.info("No accuracy history yet.")
 
